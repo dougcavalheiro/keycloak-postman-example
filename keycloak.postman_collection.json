@@ -6,589 +6,733 @@
 	},
 	"item": [
 		{
-			"name": "admin client_credentials token",
-			"event": [
+			"name": "admin-cli-auth",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Should set client credentials access token\", function () {",
-							"    var jsonData = pm.response.json();    ",
-							"    pm.expect(jsonData.access_token).to.be.not.empty;",
-							"    pm.environment.set(\"client_credentials_access_token\", jsonData.access_token);",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded"
-					}
-				],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
+					"name": "admin client_credentials token",
+					"event": [
 						{
-							"key": "client_id",
-							"value": "{{admin_cli_client_id}}",
-							"type": "text"
-						},
-						{
-							"key": "grant_type",
-							"value": "client_credentials",
-							"type": "text"
-						},
-						{
-							"key": "client_secret",
-							"value": "{{admin_cli_client_secret}}",
-							"type": "text"
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Should set client credentials access token\", function () {",
+									"    var jsonData = pm.response.json();    ",
+									"    pm.expect(jsonData.access_token).to.be.not.empty;",
+									"    pm.environment.set(\"client_credentials_access_token\", jsonData.access_token);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
 						}
-					]
-				},
-				"url": {
-					"raw": "{{host}}/realms/master/protocol/openid-connect/token",
-					"host": [
-						"{{host}}"
 					],
-					"path": [
-						"realms",
-						"master",
-						"protocol",
-						"openid-connect",
-						"token"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "create-user",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"var moment = require('moment');",
-							"",
-							"var now = moment().format(\"YYYYMMDDHHmmss\");",
-							"var first_name = now.substring(8, 14)",
-							"var last_name = now.substring(0, 8);",
-							"",
-							"pm.environment.set(\"first_name\", first_name);",
-							"pm.environment.set(\"last_name\", last_name);",
-							"pm.environment.set(\"user_name\", first_name.concat('.', last_name));",
-							"pm.environment.set(\"user_password\", now);"
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
 						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Header Location is present\", function () {",
-							"    pm.response.to.have.header(\"Location\");",
-							"    ",
-							"    var location = pm.response.headers.get(\"Location\");",
-							"    var user_id = location.substring(location.lastIndexOf('/') + 1);",
-							"    pm.environment.set(\"user_id\", user_id);    ",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{client_credentials_access_token}}",
-						"type": "text"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"username\": \"{{user_name}}\",\n    \"email\": \"{{user_name}}@example.com\",\n    \"firstName\": \"{{first_name}}\",\n    \"lastName\": \"{{last_name}}\",\n    \"credentials\": [\n        {\n            \"type\": \"password\",\n            \"value\": \"{{user_password}}\"\n        }\n    ],\n    \"enabled\": true,\n    \"emailVerified\": true\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{admin_cli_client_id}}",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{admin_cli_client_secret}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/realms/master/protocol/openid-connect/token",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"realms",
+								"master",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
 						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/admin/realms/{{realm}}/users",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"admin",
-						"realms",
-						"{{realm}}",
-						"users"
-					]
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "change-user",
-			"event": [
+			"name": "realm",
+			"item": [
 				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 204\", function () {",
-							"    pm.response.to.have.status(204);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{client_credentials_access_token}}",
-						"type": "text"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"lastName\": \"changed\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+					"name": "create-healm",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var moment = require('moment');",
+									"",
+									"var realm = moment().format(\"YYYYMMDDHHmmss\");",
+									"",
+									"pm.environment.set(\"realm_name\", realm);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
 						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/admin/realms/{{realm}}/users/{{user_id}}",
-					"host": [
-						"{{host}}"
 					],
-					"path": [
-						"admin",
-						"realms",
-						"{{realm}}",
-						"users",
-						"{{user_id}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get-user-by-id",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							""
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_credentials_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
 						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"id\");",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{client_credentials_access_token}}",
-						"type": "text"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{host}}/admin/realms/{{realm}}/users/{{user_id}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"admin",
-						"realms",
-						"{{realm}}",
-						"users",
-						"{{user_id}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "login-password-token",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Should set refresh token\", function () {",
-							"    var jsonData = pm.response.json();    ",
-							"    pm.expect(jsonData.refresh_token).to.be.not.empty;",
-							"    pm.environment.set(\"refresh_token\", jsonData.refresh_token);",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded"
-					}
-				],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "client_id",
-							"value": "{{client_id}}",
-							"type": "text"
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"realm\": \"{{realm_name}}\",\n    \"enabled\": true    \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
-						{
-							"key": "username",
-							"value": "{{user_name}}",
-							"type": "text"
-						},
-						{
-							"key": "password",
-							"value": "{{user_password}}",
-							"type": "text"
-						},
-						{
-							"key": "grant_type",
-							"value": "password",
-							"type": "text"
-						},
-						{
-							"key": "scope",
-							"value": "profile",
-							"type": "text"
-						},
-						{
-							"key": "client_secret",
-							"value": "{{client_secret}}",
-							"type": "text"
+						"url": {
+							"raw": "{{host}}/admin/realms",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"realms"
+							]
 						}
-					]
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{host}}/realms/{{realm}}/protocol/openid-connect/token",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"realms",
-						"{{realm}}",
-						"protocol",
-						"openid-connect",
-						"token"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "refresh-token",
-			"event": [
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Refresh token not empty\", function () {",
-							"    var jsonData = pm.response.json();    ",
-							"    pm.expect(jsonData.refresh_token).to.be.not.empty;",
-							"    pm.environment.set(\"refresh_token\", jsonData.refresh_token);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded"
-					}
-				],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
+					"name": "delete-realm",
+					"event": [
 						{
-							"key": "client_id",
-							"value": "{{client_id}}",
-							"type": "text"
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
 						},
 						{
-							"key": "client_secret",
-							"value": "{{client_secret}}",
-							"type": "text"
-						},
-						{
-							"key": "grant_type",
-							"value": "refresh_token",
-							"type": "text"
-						},
-						{
-							"key": "refresh_token",
-							"value": "{{refresh_token}}",
-							"type": "text"
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
 						}
-					]
-				},
-				"url": {
-					"raw": "{{host}}/realms/{{realm}}/protocol/openid-connect/token",
-					"host": [
-						"{{host}}"
 					],
-					"path": [
-						"realms",
-						"{{realm}}",
-						"protocol",
-						"openid-connect",
-						"token"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "logout-by-refresh-token",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 204\", function () {",
-							"    pm.response.to.have.status(204);",
-							"});"
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_credentials_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
 						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded"
-					}
-				],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "client_id",
-							"value": "{{client_id}}",
-							"type": "text"
-						},
-						{
-							"key": "client_secret",
-							"value": "{{client_secret}}",
-							"type": "text"
-						},
-						{
-							"key": "refresh_token",
-							"value": "{{refresh_token}}",
-							"type": "text"
+						"url": {
+							"raw": "{{host}}/admin/realms/{{realm_name}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"realms",
+								"{{realm_name}}"
+							]
 						}
-					]
-				},
-				"url": {
-					"raw": "{{host}}/realms/{{realm}}/protocol/openid-connect/logout",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"realms",
-						"{{realm}}",
-						"protocol",
-						"openid-connect",
-						"logout"
-					]
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "logout-user-by-id-all-sessions",
-			"event": [
+			"name": "user",
+			"item": [
 				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							""
+					"name": "create-user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var moment = require('moment');",
+									"",
+									"var now = moment().format(\"YYYYMMDDHHmmss\");",
+									"var first_name = now.substring(8, 14)",
+									"var last_name = now.substring(0, 8);",
+									"",
+									"pm.environment.set(\"first_name\", first_name);",
+									"pm.environment.set(\"last_name\", last_name);",
+									"pm.environment.set(\"user_name\", first_name.concat('.', last_name));",
+									"pm.environment.set(\"user_password\", now);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Header Location is present\", function () {",
+									"    pm.response.to.have.header(\"Location\");",
+									"    ",
+									"    var location = pm.response.headers.get(\"Location\");",
+									"    var user_id = location.substring(location.lastIndexOf('/') + 1);",
+									"    pm.environment.set(\"user_id\", user_id);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_credentials_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
 						],
-						"type": "text/javascript"
-					}
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"{{user_name}}\",\n    \"email\": \"{{user_name}}@example.com\",\n    \"firstName\": \"{{first_name}}\",\n    \"lastName\": \"{{last_name}}\",\n    \"credentials\": [\n        {\n            \"type\": \"password\",\n            \"value\": \"{{user_password}}\"\n        }\n    ],\n    \"enabled\": true,\n    \"emailVerified\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/admin/realms/{{realm}}/users",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"realms",
+								"{{realm}}",
+								"users"
+							]
+						}
+					},
+					"response": []
 				},
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 204\", function () {",
-							"    pm.response.to.have.status(204);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{client_credentials_access_token}}",
-						"type": "text"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{host}}/admin/realms/{{realm}}/users/{{user_id}}/logout",
-					"host": [
-						"{{host}}"
+					"name": "change-user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
 					],
-					"path": [
-						"admin",
-						"realms",
-						"{{realm}}",
-						"users",
-						"{{user_id}}",
-						"logout"
-					]
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_credentials_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"lastName\": \"changed\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/admin/realms/{{realm}}/users/{{user_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"realms",
+								"{{realm}}",
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-user-by-id",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"id\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_credentials_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/admin/realms/{{realm}}/users/{{user_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"realms",
+								"{{realm}}",
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-user-by-id",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_credentials_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/admin/realms/{{realm}}/users/{{user_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"realms",
+								"{{realm}}",
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "delete-user-by-id",
-			"event": [
+			"name": "session-token",
+			"item": [
 				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							""
+					"name": "login-password-token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Should set refresh token\", function () {",
+									"    var jsonData = pm.response.json();    ",
+									"    pm.expect(jsonData.refresh_token).to.be.not.empty;",
+									"    pm.environment.set(\"refresh_token\", jsonData.refresh_token);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
 						],
-						"type": "text/javascript"
-					}
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{client_id}}",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "{{user_name}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{user_password}}",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "profile",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/realms/{{realm}}/protocol/openid-connect/token",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"realms",
+								"{{realm}}",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						}
+					},
+					"response": []
 				},
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 204\", function () {",
-							"    pm.response.to.have.status(204);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{client_credentials_access_token}}",
-						"type": "text"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{host}}/admin/realms/{{realm}}/users/{{user_id}}",
-					"host": [
-						"{{host}}"
+					"name": "refresh-token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Refresh token not empty\", function () {",
+									"    var jsonData = pm.response.json();    ",
+									"    pm.expect(jsonData.refresh_token).to.be.not.empty;",
+									"    pm.environment.set(\"refresh_token\", jsonData.refresh_token);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
 					],
-					"path": [
-						"admin",
-						"realms",
-						"{{realm}}",
-						"users",
-						"{{user_id}}"
-					]
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{client_id}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "refresh_token",
+									"type": "text"
+								},
+								{
+									"key": "refresh_token",
+									"value": "{{refresh_token}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/realms/{{realm}}/protocol/openid-connect/token",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"realms",
+								"{{realm}}",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout-by-refresh-token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{client_id}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"type": "text"
+								},
+								{
+									"key": "refresh_token",
+									"value": "{{refresh_token}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/realms/{{realm}}/protocol/openid-connect/logout",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"realms",
+								"{{realm}}",
+								"protocol",
+								"openid-connect",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout-user-by-id-all-sessions",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_credentials_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/admin/realms/{{realm}}/users/{{user_id}}/logout",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"realms",
+								"{{realm}}",
+								"users",
+								"{{user_id}}",
+								"logout"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		}
 	],
 	"event": [
@@ -618,15 +762,15 @@
 		},
 		{
 			"key": "realm",
-			"value": "postman-example"
+			"value": "realm-example"
 		},
 		{
 			"key": "client_id",
-			"value": "postman-example-client"
+			"value": "realm-example-client"
 		},
 		{
 			"key": "client_secret",
-			"value": "E1Qvg0WIZQI69OJBjvd2LCXBJ3cBMMfS"
+			"value": "aAUG13A6Xpraz4Woo4sta5sRfaiFPcO3"
 		},
 		{
 			"key": "admin_cli_client_id",
@@ -634,7 +778,7 @@
 		},
 		{
 			"key": "admin_cli_client_secret",
-			"value": "kQqFCTyBNUnYzMhi5WXRswUoXzjiXFVo"
+			"value": "6fB8Rm00NUdgt8OnWGzjg86DbZ2C23e3"
 		}
 	]
 }
