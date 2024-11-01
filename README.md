@@ -1,6 +1,6 @@
 # Auth-Keycloak
 
-This repo covers the most common api rest calls to manage users trought keycloak. 
+This repo covers the most common api rest calls to manage users through keycloak. 
 
 ## Prerequisites
 
