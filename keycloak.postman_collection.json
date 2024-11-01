@@ -202,6 +202,349 @@
 			]
 		},
 		{
+			"name": "client-roles",
+			"item": [
+				{
+					"name": "get-client-uuid",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    var jsonData = pm.response.json();    ",
+									"    pm.expect(jsonData[0].id).to.be.not.empty;",
+									"    pm.environment.set(\"client_uuid\", jsonData[0].id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_credentials_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/admin/realms/{{realm}}/clients?clientId={{client_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"",
+								"admin",
+								"realms",
+								"{{realm}}",
+								"clients"
+							],
+							"query": [
+								{
+									"key": "clientId",
+									"value": "{{client_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-client-role",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_credentials_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"ROLE_EXAMPLE\",\n    \"description\": \"Example of Role\"    \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}//admin/realms/{{realm}}/clients/{{client_uuid}}/roles",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"",
+								"admin",
+								"realms",
+								"{{realm}}",
+								"clients",
+								"{{client_uuid}}",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-client-role",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_credentials_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/admin/realms/{{realm}}/clients/{{client_uuid}}/roles/ROLE_EXAMPLE",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"realms",
+								"{{realm}}",
+								"clients",
+								"{{client_uuid}}",
+								"roles",
+								"ROLE_EXAMPLE"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "realm-roles",
+			"item": [
+				{
+					"name": "create-realm-role",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_credentials_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"ROLE_EXAMPLE\",\n    \"description\": \"Example of Role\"    \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}//admin/realms/{{realm}}/roles",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"",
+								"admin",
+								"realms",
+								"{{realm}}",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-realm-role",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_credentials_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/admin/realms/{{realm}}/roles/ROLE_EXAMPLE",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"realms",
+								"{{realm}}",
+								"roles",
+								"ROLE_EXAMPLE"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "user",
 			"item": [
 				{
@@ -327,7 +670,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"lastName\": \"changed\"\n}",
+							"raw": "{\n    \"lastName\": \"changed\",\n    \"realmRoles\": [\"default-roles-realm-example\"]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
